@@ -1,0 +1,108 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title> Building your first Phaser 3 Game</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body { margin: 0; }
+        canvas { display: block; margin: auto; }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        /***** CHANGE *****/
+        // Adjust height and background colour to look better
+        height: 576,
+        backgroundColor: '#2d2d2d',
+        /******************/
+        pixelArt: true,
+        physics: {
+            default: 'arcade',
+            arcade: {
+            }
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+
+    var sprite;
+    var player;
+
+    /***** New *****/
+    var map;
+    var groundLayer;
+    var coinLayer;
+    /***************/
+
+    function preload ()
+    {
+        this.load.image('staticPlayer', 'assets/sprites/dude.png');
+
+        this.load.spritesheet('animatedPlayer', 'assets/sprites/animated-dude.png', { frameWidth: 32, frameHeight: 48 });
+
+        /***** New *****/
+        // Load the Level assets
+        this.load.image('ground_1x1', 'assets/tilemaps/tiles/ground_1x1.png');
+        this.load.spritesheet('coin', 'assets/sprites/coin.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/tile-collision-test.json');
+        /***************/
+    }
+
+    function create ()
+    {
+        sprite = this.physics.add.sprite(100, 450, 'staticPlayer');
+        player = this.physics.add.sprite(200, 450, 'animatedPlayer');
+
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('animatedPlayer', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'idle',
+            frames: [ { key: 'animatedPlayer', frame: 4 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('animatedPlayer', { start: 5, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        player.anims.play('right', true);
+
+        /***** New *****/
+        // Add the tile textures
+        map = this.make.tilemap({ key: 'map' });
+        var groundTiles = map.addTilesetImage('ground_1x1');
+        var coinTiles = map.addTilesetImage('coin');
+
+        // Create the different Layers
+        map.createDynamicLayer('Background Layer', groundTiles, 0, 0);
+        groundLayer = map.createDynamicLayer('Ground Layer', groundTiles, 0, 0);
+        coinLayer = map.createDynamicLayer('Coin Layer', coinTiles, 0, 0);
+        /**************/
+    }
+
+    function update (time, delta)
+    {
+
+    }
+</script>
+
+</body>
+</html>
